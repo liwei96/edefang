@@ -1,32 +1,73 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
     <router-view/>
   </div>
 </template>
 
-<style lang="less">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<script>
+export default {
+  mounted(){
+    resetrem();
+    //切换屏幕 （横屏竖屏）
+    window.addEventListener("orientationchange", resetrem);
+    //resize：屏幕的大小发生改变就触发监听事件resetrem
+    window.addEventListener("resize", resetrem);
 
-#nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
+    function resetrem() {
+      var html = document.querySelector("html"); //获取到html元素
+      var width = html.getBoundingClientRect().width; //获取屏幕的宽度
+      html.style.fontSize = width / 23.5 + "px";
     }
   }
+}
+</script>
+<style lang="less">
+*{
+  margin:0;
+  padding:0
+}
+html {
+  max-width: 540px;
+}
+
+@keyframes big-in {
+  0% {
+    
+    transform: translate3d(-50%,-50%,0);
+    transform: scale(0.2);
+    
+  }
+  100% {
+    position: fixed;
+    transform: translate3d(-50%,-50%,0);
+    transform: scale(1);
+    top: 50%;
+    left: 50%;
+  }
+}
+@keyframes big-out {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0.5);
+  }
+}
+
+.change-enter,
+.change-leave-active {
+  opacity: 0;
+  scale: 0.5;
+}
+.change-enter-active {
+  position: fixed;
+  top: 50%;
+    left: 50%;
+  transition: opacity 5s;
+  animation: big-in 5s;
+}
+.change-leave-active {
+  transition: opacity 0.5s;
+  // animation: big-out 0.5s;
 }
 </style>

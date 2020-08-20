@@ -70,12 +70,13 @@ export default {
         this.$toast("手机号码不合法");
         return;
       }
-      let id = this.id;
+      let id = this.$route.params.id;
       let typenum = this.typenum;
       let ip = ip_arr["ip"];
       putmsg({
+        ip:ip,
         tel: phone,
-        page: 7,
+        page: 9,
         project: id,
         remark: "",
         source: "线上推广3",

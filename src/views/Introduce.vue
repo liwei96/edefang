@@ -1,5 +1,5 @@
 <template>
-  <div id="Introduce">
+  <div id="Introduce" v-wechat-title="proname">
     <header>
       <img class="logo" src="../assets/logo.png" alt />
       <span>楼盘简介</span>
@@ -129,7 +129,7 @@
     <footer>
       <ul>
         <li @click="go('/index/')">楼盘首页</li>
-        <li @click="go('/introduce/')" class="active">楼盘简介</li>
+        <li @click="go('/intro/')" class="active">楼盘简介</li>
         <li @click="go('/dynamic/')">楼盘动态</li>
         <li @click="go('/image/')">楼盘图册</li>
         <li @click="go('/about/')">联系我们</li>
@@ -144,8 +144,8 @@
         <a href>浙ICP备18057005号</a>
       </p>
     </footer>
-    <van-popup v-model="show" position="right" :style="{ height: '100%',width:'61%' }">
-      <list :num="2"></list>
+    <van-popup v-model="show" position="right" :style="{ height: '100%',width:'61%' }" duration="0.2">
+      <list :num="1"></list>
     </van-popup>
   </div>
 </template>
@@ -169,6 +169,7 @@ export default {
       property: "",
       main_img: "",
       isover: true,
+      proname:''
     };
   },
   components: {
@@ -213,6 +214,7 @@ export default {
     },
   },
   mounted() {
+    this.proname = sessionStorage.getItem('buildname') ? sessionStorage.getItem('buildname') : '易得房'
     this.start();
   },
   updated() {
@@ -368,9 +370,11 @@ header {
   }
   .swiper-icon {
     overflow: hidden;
+    padding: 5px 0;
     .swiper-slide {
       border: 0.03125rem solid rgba(240, 241, 245, 1);
       box-shadow: 0px 0.15625rem 0.375rem 0px rgba(0, 0, 0, 0.05);
+      border-radius: 0.375rem;
       h6 {
         color: #2e3033;
         font-size: 0.9375rem;

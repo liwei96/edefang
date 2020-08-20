@@ -1,5 +1,5 @@
 <template>
-  <div id="Brand">
+  <div id="Brand" v-wechat-title="proname">
     <nav>
       <img class="logo" src="../assets/logo.png" alt />
       <span>楼盘详情</span>
@@ -42,8 +42,8 @@
         </li>
       </ul>
     </div>
-    <van-popup v-model="show" position="right" :style="{ height: '100%',width:'61%' }">
-      <list :num="2"></list>
+    <van-popup v-model="show" position="right" :style="{ height: '100%',width:'61%' }" duration="0.2">
+      <list :num="1"></list>
     </van-popup>
   </div>
 </template>
@@ -58,7 +58,8 @@ export default {
       show: false,
       bus:'',
       property:'',
-      introduce:''
+      introduce:'',
+      proname:''
     };
   },
   components: {
@@ -83,6 +84,7 @@ export default {
     }
   },
   mounted() {
+    this.proname = sessionStorage.getItem('buildname') ? sessionStorage.getItem('buildname') : '易得房'
     this.start()
     $(".more").on("click", function () {
       let type = $(this).attr("data-v");
@@ -132,6 +134,7 @@ nav {
       border: 1px solid rgba(240, 241, 245, 1);
       box-shadow: 0px 2.5px 6px 0px rgba(0, 0, 0, 0.05);
       margin-bottom: 0.9375rem;
+      border-radius: 0.25rem;
       .liimg {
         width: 1.875rem;
         margin-right: 1rem;

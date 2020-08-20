@@ -1,6 +1,7 @@
 <template>
   <div id="list">
     <ul>
+      <li @click="login"><img src="../assets/login.png" alt="">{{msg}}<span @click.stop="logout" v-if="islog">退出</span></li>
       <li
         :class="num == key ? 'active' : ''"
         v-for="(item,key) in arr"
@@ -11,6 +12,7 @@
         {{item.name}}
       </li>
     </ul>
+    
   </div>
 </template>
 <script>
@@ -18,12 +20,6 @@ export default {
   data() {
     return {
       arr: [
-        {
-          name: "登录",
-          img: require("../assets/login.png"),
-          active: require("../assets/login-active.png"),
-          url: "/login/",
-        },
         {
           name: "楼盘首页",
           img: require("../assets/home.png"),
@@ -34,7 +30,7 @@ export default {
           name: "楼盘简介",
           img: require("../assets/intro.png"),
           active: require("../assets/intro-active.png"),
-          url: "/introduce/",
+          url: "/intro/",
         },
         {
           name: "楼盘动态",
@@ -56,6 +52,8 @@ export default {
         },
       ],
       id: "",
+      msg:'登录',
+      islog:false,
     };
   },
   props: {
@@ -66,11 +64,32 @@ export default {
   },
   methods: {
     go(url) {
-        this.$router.push(url + this.id);
+      this.$router.push(url + this.id);
     },
+    login(){
+      if(!this.$cookies.get('token')){
+        this.$router.push('/login/' + this.id)
+      }
+    },
+    logout(){
+      this.$cookies.remove('token')
+      this.$cookies.remove('tel')
+      window.location.reload()
+    }
   },
   created() {
     this.id = this.$route.params.id;
+    if (this.$cookies.get("token")) {
+      let tel =
+        this.$cookies.get("tel").substr(0, 3) +
+        "****" +
+        this.$cookies.get("tel").substr(7);
+        this.msg = tel
+        this.islog = true
+    }else{
+      this.msg = '登录'
+      this.islog=false
+    }
   },
 };
 </script>
@@ -88,11 +107,17 @@ export default {
         margin-bottom: -0.3125rem;
         margin-right: 1rem;
       }
+      span {
+        font-size: .875rem;
+        margin-left: .75rem;
+        color: #4c5f8c
+      }
     }
     .active {
       background-color: #d1a23d;
       color: #fff;
     }
   }
+  
 }
 </style>

@@ -1,12 +1,12 @@
 <template>
   <div id="app">
-    <router-view/>
+    <router-view />
   </div>
 </template>
 
 <script>
 export default {
-  mounted(){
+  mounted() {
     resetrem();
     //切换屏幕 （横屏竖屏）
     window.addEventListener("orientationchange", resetrem);
@@ -18,13 +18,20 @@ export default {
       var width = html.getBoundingClientRect().width; //获取屏幕的宽度
       html.style.fontSize = width / 23.5 + "px";
     }
-  }
-}
+    // var _hmt = _hmt || [];
+    // (function () {
+    //   var hm = document.createElement("script");
+    //   hm.src = "https://hm.baidu.com/hm.js?1c9aa262da40a79323320ad1cd0b1ae8";
+    //   var s = document.getElementsByTagName("script")[0];
+    //   s.parentNode.insertBefore(hm, s);
+    // })();
+  },
+};
 </script>
 <style lang="less">
-*{
-  margin:0;
-  padding:0
+* {
+  margin: 0;
+  padding: 0;
 }
 html {
   max-width: 540px;
@@ -32,14 +39,12 @@ html {
 
 @keyframes big-in {
   0% {
-    
-    transform: translate3d(-50%,-50%,0);
+    transform: translate3d(-50%, -50%, 0);
     transform: scale(0.2);
-    
   }
   100% {
     position: fixed;
-    transform: translate3d(-50%,-50%,0);
+    transform: translate3d(-50%, -50%, 0);
     transform: scale(1);
     top: 50%;
     left: 50%;
@@ -62,7 +67,7 @@ html {
 .change-enter-active {
   position: fixed;
   top: 50%;
-    left: 50%;
+  left: 50%;
   transition: opacity 5s;
   animation: big-in 5s;
 }

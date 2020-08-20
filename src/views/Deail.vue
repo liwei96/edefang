@@ -133,8 +133,8 @@
       </div>
     </div>
     <food :tel="tel" @fot="chang($event)"></food>
-    <van-popup v-model="show" position="right" :style="{ height: '100%',width:'61%' }">
-      <list :num="1"></list>
+    <van-popup v-model="show" position="right" :style="{ height: '100%',width:'61%' }" duration="0.2">
+      <list :num="0"></list>
     </van-popup>
     <van-popup v-model="tan" :style="{background:'rgba(0,0,0,0)'}">
       <popup

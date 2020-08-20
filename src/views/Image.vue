@@ -1,5 +1,5 @@
 <template>
-  <div class="Album">
+  <div class="Album" v-wechat-title="proname">
     <!-- 头部导航 -->
     <p id="allimg" @click="go">全部相册</p>
     <img src="../assets/wightleft.png" alt id="back" @click="back" />
@@ -42,7 +42,7 @@
                 <div class="swiper-container banner">
                   <div class="swiper-wrapper">
                     <div class="swiper-slide" v-for="(item,key) in efects" :key="key">
-                      <img :src="item.big" />
+                      <img v-lazy="item.big" />
                     </div>
                   </div>
                   <div class="swiper-pagination page1"></div>
@@ -61,7 +61,7 @@
                 <div class="swiper-container banner">
                   <div class="swiper-wrapper">
                     <div class="swiper-slide" v-for="(item,key) in reals" :key="key">
-                      <img :src="item.big" />
+                      <img v-lazy="item.big" />
                     </div>
                   </div>
                   <div class="swiper-pagination page2"></div>
@@ -78,7 +78,7 @@
                 <div class="swiper-container banner">
                   <div class="swiper-wrapper">
                     <div class="swiper-slide" v-for="(item,key) in templates" :key="key">
-                      <img :src="item.big" />
+                      <img v-lazy="item.big" />
                     </div>
                   </div>
                   <div class="swiper-pagination page3"></div>
@@ -95,7 +95,7 @@
                 <div class="swiper-container banner">
                   <div class="swiper-wrapper">
                     <div class="swiper-slide" v-for="(item,key) in traffics" :key="key">
-                      <img :src="item.big" />
+                      <img v-lazy="item.big" />
                     </div>
                   </div>
                   <div class="swiper-pagination page4"></div>
@@ -112,7 +112,7 @@
                 <div class="swiper-container banner">
                   <div class="swiper-wrapper">
                     <div class="swiper-slide" v-for="(item,key) in apartments" :key="key">
-                      <img :src="item.big" />
+                      <img v-lazy="item.big" />
                     </div>
                   </div>
                   <div class="swiper-pagination page5"></div>
@@ -129,7 +129,7 @@
                 <div class="swiper-container banner">
                   <div class="swiper-wrapper">
                     <div class="swiper-slide" v-for="(item,key) in matchings" :key="key">
-                      <img :src="item.big" />
+                      <img v-lazy="item.big" />
                     </div>
                   </div>
                   <div class="swiper-pagination page5"></div>
@@ -143,8 +143,8 @@
 
     <!-- 底部悬浮按钮 -->
     <div class="nav">
-      <div class="nav-peo">
-        <img src="../assets/people.png" alt />
+      <div class="nav-peo" @click="gotalk">
+        <img src="../assets/jiapeo.png" alt />
         <span>1</span>
         <p>咨询</p>
       </div>
@@ -229,6 +229,7 @@ export default {
       typebtn: "",
       tan: false,
       one: true,
+      proname:''
     };
   },
   methods: {
@@ -270,8 +271,9 @@ export default {
       let ip = ip_arr["ip"];
       putmsg({
         tel: phone,
-        page: 7,
+        page: 9,
         project: id,
+        ip:ip,
         remark: "",
         source: "线上推广3",
         name: "未知",
@@ -348,8 +350,19 @@ export default {
     go() {
       this.$router.push("/photo/" + this.id);
     },
+    gotalk() {
+      let url = window.location.href;
+      let newurl = url.split("?")[0];
+      let id = this.$route.params.id;
+      let name = sessionStorage.getItem("buildname");
+      newurl += `?proid=${id}&name=${name}`;
+      newurl = encodeURIComponent(newurl);
+      window.location.href =
+        "http://www.jy1980.com:9191/hangzhou/talk?reconnect=" + newurl;
+    },
   },
   mounted() {
+    this.proname = sessionStorage.getItem('buildname') ? sessionStorage.getItem('buildname') : '易得房'
     let that = this;
     that.baoming = this.$cookies.get('tel');
     this.start();
@@ -880,7 +893,6 @@ body {
   border: 1px solid #c9c9c9;
   border-radius: 2px;
   -webkit-appearance: none;
-  display: inline-block;
   padding: 0;
   float: left;
   margin-top: 3px;

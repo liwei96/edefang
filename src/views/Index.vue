@@ -1,5 +1,5 @@
 <template>
-  <div id="index">
+  <div id="index" v-wechat-title="proname">
     <nav>
       <img class="logo" src="../assets/logo.png" alt />
       <span>楼盘详情</span>
@@ -9,7 +9,7 @@
       <div class="swiper-topimgs">
         <div class="swiper-wrapper">
           <div class="swiper-slide" v-for="(item,key) in effect" :key="key">
-            <img :src="item.small" alt />
+            <img v-lazy="item.small" alt />
           </div>
         </div>
         <!-- 如果需要分页器 -->
@@ -55,7 +55,9 @@
       <p class="info-address">
         地址：
         <span>{{basic.address}}</span>
-        <img src="../assets/map-address.png" alt />
+        <router-link :to="'/zhou/'+basic.id">
+          <img src="../assets/map-address.png" alt />
+        </router-link>
       </p>
       <p class="moreinfo" @click="godetail">更多楼盘详情</p>
       <div class="infobtn">
@@ -131,8 +133,8 @@
         </router-link>
       </h4>
       <div class="house-con" v-for="(item,val) in appart" :key="val">
-        <router-link :to="'/hudeal/'+basic.id">
-          <img :src="item.img" alt />
+        <router-link :to="'/hudeal/'+basic.id+'/'+item.id">
+          <img v-lazy="item.img" alt />
           <div class="house-right">
             <h5>
               {{item.title}}
@@ -159,7 +161,9 @@
         <span :class="matenum == 2 ? 'active' : ''" @click="setmatenum(2)">宜居分析</span>
       </div>
       <div class="material-con">
-        <p v-for="(item,key) in analysises" :key="key" v-if="matenum == item.type">{{item.content}}</p>
+        <template v-for="(item,key) in analysises">
+        <p :key="key" v-if="matenum == item.type">{{item.content}}</p>
+        </template>
       </div>
       <button class="btnicon" @click="showbox(68,'领取分析资料')">
         <img src="../assets/ling.png" />领取分析资料
@@ -181,7 +185,7 @@
       </p>
 
       <div class="analyze-peo" v-for="(item,key) in staff" :key="key">
-        <img class="peo" :src="item.head_img" alt />
+        <img class="peo" v-lazy="item.head_img" alt />
         <div class="analyze-con">
           <h6>
             {{item.name}}
@@ -190,8 +194,10 @@
           <p v-if="key==0">了解房源特色，专业挑好房</p>
           <p v-if="key==1">为客户提供专业的购房建议</p>
         </div>
-        <img class="analyze-talk" src="../assets/msg.png" alt />
-        <img class="analyze-talk1" src="../assets/tel.png" alt />
+        <img class="analyze-talk" src="../assets/msg.png" alt @click="gotalk" />
+        <a :href="'tel:'+phone">
+          <img class="analyze-talk1" src="../assets/tel.png" alt />
+        </a>
       </div>
     </div>
     <div class="line"></div>
@@ -318,7 +324,7 @@
     <div class="comment">
       <h4>
         用户点评
-        <router-link :to="'/comments/'+basic.id">
+        <router-link :to="'/discusss/'+basic.id">
           <span>
             更多点评
             <img src="../assets/go.png" alt />
@@ -335,7 +341,7 @@
             <span class="comment-del" v-if="item.mine == 1" @click="del(item.id)">删除</span>
             <span class="comment-btn">
               <img
-                :src="item.my_like == 0 ? before : after"
+                v-lazy="item.my_like == 0 ? before : after"
                 @click="agree(item.my_like,item.id,key)"
               />
               {{item.like_num}}
@@ -348,17 +354,17 @@
       </button>
     </div>
     <foot :tel="phone" @fot="chang($event)"></foot>
-    <van-popup v-model="show" position="right" :style="{ height: '100%',width:'61%' }">
-      <list :num="1"></list>
+    <van-popup v-model="show" position="right" :style="{ height: '100%',width:'61%' }" duration="0.2">
+      <list :num="0"></list>
     </van-popup>
-    <van-popup v-model="tan" :style="{background:'rgba(0,0,0,0)'}" @click-overlay="setnew" position="center">
-      <popup
-        :typenum="typenum"
-        :id="basic.id"
-        :name="name"
-        @close="cli($event)"
-        :typebtn="typebtn"
-      ></popup>
+    <van-popup
+      v-model="tan"
+      :style="{background:'rgba(0,0,0,0)'}"
+      @click-overlay="setnew"
+      position="center"
+      duration="0.2"
+    >
+      <popup :typenum="typenum" :id="basic.id" :name="name" @close="cli($event)" :typebtn="typebtn"></popup>
     </van-popup>
   </div>
 </template>
@@ -368,7 +374,7 @@ import "swiper/css/swiper.min.css";
 import footer from "../components/Footer";
 import list from "../components/List";
 import Popup from "@/components/Popup.vue";
-import { getindex, agcomment, delcomment,getindexs } from "../api/api";
+import { getindex, agcomment, delcomment, getindexs } from "../api/api";
 export default {
   data() {
     return {
@@ -398,11 +404,10 @@ export default {
       before: require("../assets/noclick.png"),
       after: require("../assets/clicked.png"),
       isover: true,
-      effect:[
-        {'small':require('../assets/default.jpg')}
-      ],
-      url:'',
-      house:''
+      effect: [{ small: require("../assets/default.jpg") }],
+      url: "",
+      house: "",
+      proname: "",
     };
   },
   components: {
@@ -470,10 +475,10 @@ export default {
             type: "bar",
             itemStyle: {
               // 转折点 控制
-              color: '#F6D67D'
+              color: "#F6D67D",
             },
-            barWidth: 20,  // 柱形的宽度
-            barCategoryGap: '10%',  // 柱形的间距
+            barWidth: 20, // 柱形的宽度
+            barCategoryGap: "10%", // 柱形的间距
           },
         ],
       };
@@ -578,7 +583,7 @@ export default {
       this.$router.push("/deail/" + this.basic.id);
     },
     start() {
-       let url = window.location.href;
+      let url = window.location.href;
       url = url.split("?")[1];
       if (url && url.indexOf("kid") !== -1) {
         url = url.split("&");
@@ -588,10 +593,7 @@ export default {
         sessionStorage.setItem("other", other);
       }
       let id = this.$route.params.id;
-      let token = this.$cookies.get('token');
-      getindexs(id,token).then(res=>{
-        console.log(res)
-      })
+      let token = this.$cookies.get("token");
       getindex(id, token).then((res) => {
         this.basic = res.data.data.basic;
         this.newdynamic = res.data.data.dynamics[0];
@@ -599,6 +601,7 @@ export default {
         this.appart = res.data.data.appartments;
         this.analysises = res.data.data.analysises;
         this.phone = res.data.common.phone;
+        sessionStorage.setItem("tel", res.data.common.phone);
         this.staff = res.data.common.staffs;
         this.search_count = res.data.data.basic.count.search_count;
         this.chengjiao = res.data.data.deals;
@@ -609,12 +612,20 @@ export default {
         }
         this.lines = line;
         this.baidu = [this.basic.longitude, this.basic.latitude];
+        this.proname = res.data.data.basic.name;
+        let url = window.location.href;
+        let newurl = url.split("?")[0];
+        let id = this.$route.params.id;
+        let name = this.proname;
+        newurl += `?proid=${id}&name=${name}`;
+        newurl = encodeURIComponent(newurl);
+        this.url = newurl;
         sessionStorage.setItem("baidu", this.baidu);
         sessionStorage.setItem("buildname", this.basic.name);
         sessionStorage.setItem("buildaddress", this.basic.address);
         this.comments = res.data.data.comments;
-        this.effect = res.data.data.basic.imgs.effect
-        this.house = res.data.data.basic.rooms.slice(0,2).join('/')
+        this.effect = res.data.data.basic.imgs.effect;
+        this.house = res.data.data.basic.rooms.slice(0, 2).join("/");
       });
     },
     setmatenum(num) {
@@ -628,13 +639,13 @@ export default {
       this.typenum = id;
       this.name = name;
       this.tan = true;
-      this.typebtn = 1
+      this.typebtn = 1;
     },
     chang(data) {
       this.typenum = data.position;
       this.name = data.name;
       this.tan = true;
-      this.typebtn = 1
+      this.typebtn = 1;
     },
     cli(e) {
       this.tan = e;
@@ -643,38 +654,38 @@ export default {
       this.typebtn = 0;
     },
     agree(type, id, key) {
-      let token = this.$cookies.get('token')
+      let token = this.$cookies.get("token");
       if (token) {
         if (this.isover) {
           this.isover = false;
-          agcomment({ token: token, id: id }).then(
-            (res) => {
-              this.isover = true;
-              this.comments[key].like_num = res.data.like_num;
-            }
-          );
+          agcomment({ token: token, id: id }).then((res) => {
+            this.isover = true;
+            this.comments[key].like_num = res.data.like_num;
+          });
         }
       } else {
         sessionStorage.setItem("back", this.$route.path);
-        this.$router.push("/login/"+this.$route.params.id);
+        this.$router.push("/login/" + this.$route.params.id);
       }
     },
     del(id) {
-      let token = this.$cookies.get('token')
-      delcomment({ token: token, id: id }).then(
-        (res) => {
-          this.$router.go(0);
-        }
-      );
+      let token = this.$cookies.get("token");
+      delcomment({ token: token, id: id }).then((res) => {
+        this.$router.go(0);
+      });
     },
     gocomment() {
-      let token = this.$cookies.get('token')
-      if(token){
-        this.$router.push("/comment/" + this.basic.id);
-      }else{
-        sessionStorage.setItem('back',this.$route.path)
-        this.$router.push('/login/'+this.$route.params.id)
+      let token = this.$cookies.get("token");
+      if (token) {
+        this.$router.push("/discuss/" + this.basic.id);
+      } else {
+        sessionStorage.setItem("back", this.$route.path);
+        this.$router.push("/login/" + this.$route.params.id);
       }
+    },
+    gotalk() {
+      window.location.href =
+        "http://www.jy1980.com:9191/hangzhou/talk?reconnect=" + this.url;
     },
   },
   mounted() {
@@ -712,7 +723,7 @@ export default {
     line-height: 2.75rem;
     position: fixed;
     max-width: 540px;
-    width:100%;
+    width: 100%;
     background-color: #fff;
     z-index: 1111;
     font-weight: bold;
@@ -733,7 +744,7 @@ export default {
     overflow: hidden;
     position: relative;
     height: 12.5rem;
-    padding-top:2.75rem;
+    padding-top: 2.75rem;
     img {
       width: 100%;
       height: 12.5rem;
@@ -785,12 +796,8 @@ export default {
     .icons {
       margin-bottom: 1.4375rem;
       .zhuang {
-        display: inline-block;
         background-color: #faf1df;
-        width: 2.25rem;
-        height: 1.125rem;
-        text-align: center;
-        line-height: 1.125rem;
+        padding: 0.1875rem 0.375rem;
         border-radius: 0.125rem;
         color: #bd8d27;
         font-size: 0.75rem;
@@ -1410,7 +1417,7 @@ export default {
       border-top: 0.5px solid #f5f5f5;
       padding: 0 4%;
       /deep/ .map-msg-con {
-        padding-top:.625rem;
+        padding-top: 0.625rem;
         /deep/ li {
           list-style: none;
           margin-bottom: 1.125rem;

@@ -1,20 +1,20 @@
 <template>
-  <div id="Zhou">
+  <div id="Zhou" v-wechat-title="proname">
     <header>
       <img class="logo" src="../assets/logo.png" alt />
       <span>配套详情</span>
-      <img class="list" src="../assets/list.png" alt />
+      <img class="list" src="../assets/list.png" alt @click="show=true"/>
     </header>
     <div class="map-con">
       <div id="map"></div>
       <div id="panel" style="display:none"></div>
       <div class="map-type tel">
-          <a href="tel:555">
+          <a :href="'tel:'+tel">
         <p>电话</p>
         <p>咨询</p>
         </a>
       </div>
-      <div class="map-type">
+      <div class="map-type" @click="showbox(82,'预约看房')">
         <p>预约</p>
         <p>看房</p>
       </div>
@@ -90,18 +90,44 @@
         <p class="map-tishi" v-if="isnull">附近没有{{mapname}}，您可以看看其他信息</p>
       </div>
     </div>
+    <van-popup v-model="show" position="right" :style="{ height: '100%',width:'61%' }" duration="0.2">
+      <list :num="0"></list>
+    </van-popup>
+    <van-popup v-model="tan" :style="{background:'rgba(0,0,0,0)'}" @click-overlay="typebtn = 0">
+      <popup
+        :typenum="typenum"
+        :id="id"
+        :name="name"
+        @close="cli($event)"
+        :typebtn="typebtn"
+      ></popup>
+    </van-popup>
   </div>
 </template>
 <script>
 import Swiper from "swiper";
 import "swiper/css/swiper.min.css";
+import list from "../components/List";
+import popup from "../components/Popup";
 export default {
   data() {
     return {
       mapname: "地铁",
       mapnum: 0,
       isnull: false,
+      show: false,
+      id: 0,
+      name: "",
+      typebtn: 1,
+      typenum: 0,
+      tan: false,
+      tel: "",
+      proname:''
     };
+  },
+  components:{
+    list,
+    popup
   },
   methods: {
     mmap() {
@@ -109,8 +135,8 @@ export default {
       let that = this;
       let baidu = [120.232623, 30.298957];
       let img = require("../assets/mappro.png");
-      let pro = "德信.杭州之翼";
-      let add = "火车东站向南500米路东";
+      let pro = sessionStorage.getItem('buildname');
+      let add = sessionStorage.getItem('buildaddress');
       AMap.convertFrom(baidu, "baidu", function (status, result) {
         if (result.info === "ok") {
           var lnglats = result.locations; // Array.<LngLat>
@@ -197,8 +223,19 @@ export default {
       this.mapname = name;
       this.mmap();
     },
+    cli(e) {
+      this.tan = e;
+    },
+    showbox(id, name) {
+      this.typenum = id;
+      this.name = name;
+      this.tan = true;
+      this.typebtn = 1
+    },
   },
   mounted() {
+    this.proname = sessionStorage.getItem('buildname') ? sessionStorage.getItem('buildname') : '易得房'
+    this.tel = sessionStorage.getItem('tel')?sessionStorage.getItem('tel'):'400-718-6686'
       this.mmap()
     var swiper08 = new Swiper(".swiper-map", {
       slidesPerView: 5.5,
@@ -210,6 +247,12 @@ export default {
 };
 </script>
 <style lang="less" scoped>
+/deep/.van-overlay{
+  z-index: 65456456464!important;
+}
+/deep/.van-popup {
+  z-index: 654564564645!important;
+}
 #Zhou {
     height: 100vh;
     display: flex;
@@ -231,7 +274,7 @@ header {
     top: 0.625rem;
   }
   .list {
-    width: 1.25rem;
+    width: 1.5rem;
     position: absolute;
     right: 4%;
     top: 0.625rem;

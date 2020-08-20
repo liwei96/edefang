@@ -57,6 +57,17 @@ export default {
         return;
       }
       let ip = ip_arr["ip"];
+      let id = this.$route.params.id
+      putmsg({
+        tel: phone,
+        page: 9,
+        ip:ip,
+        project: id,
+        remark: "",
+        source: "线上推广3",
+        name: "未知",
+        position: 80,
+      }).then((res) => {});
       sendmsg({ ip: ip, phone: phone, source: 3 }).then((res) => {
         console.log(res);
         if (res.data.code == 500) {
@@ -100,25 +111,17 @@ export default {
         return;
       }
       let pass = this.pass;
-      let id = this.$route.params.id
-      putmsg({
-        tel: phone,
-        page: 7,
-        project: id,
-        remark: "",
-        source: "线上推广3",
-        name: "未知",
-        position: 80,
-      }).then((res) => {});
+      
       logsure({ phone: phone, code: pass, source: 3, ip: ip }).then((res) => {
         if (res.data.code == 200) {
           this.$cookies.set('token',res.data.token,21600)
           this.$cookies.set('tel',phone,21600)
-          if (sessionStorage.getItem("back")) {
-            this.$router.push(sessionStorage.getItem("back"));
-          } else {
-            this.$router.go(-1);
-          }
+          // if (sessionStorage.getItem("back")) {
+          //   this.$router.push(sessionStorage.getItem("back"));
+          // } else {
+          //   this.$router.go(-1);
+          // }
+          this.$router.go(-1)
         } else {
           this.$toast("登录失败");
         }

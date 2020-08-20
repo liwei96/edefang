@@ -1,5 +1,5 @@
 <template>
-  <div id="photo">
+  <div id="photo" v-wechat-title="proname">
     <nav>
       <img class="logo" src="../assets/logo.png" alt />
       <span>楼盘相册</span>
@@ -8,45 +8,45 @@
     <div class="imgs">
       <h4>效果图({{effect.length}})</h4>
       <div class="imgs-con">
-        <img :src="item.small" alt v-for="(item,key) in effect" :key="key" @click="big(effectbig,key)" />
+        <img v-lazy="item.small" alt v-for="(item,key) in effect" :key="key" @click="big(effectbig,key)" />
       </div>
     </div>
     <div class="imgs">
       <h4>实景图({{real.length}})</h4>
       <div class="imgs-con">
-        <img :src="item.small" alt v-for="(item,key) in real" :key="key" @click="big(realbig,key)" />
+        <img v-lazy="item.small" alt v-for="(item,key) in real" :key="key" @click="big(realbig,key)" />
       </div>
     </div>
     <div class="imgs">
       <h4>样板房({{example.length}})</h4>
       <div class="imgs-con">
-        <img :src="item.small" alt v-for="(item,key) in example" :key="key"
+        <img v-lazy="item.small" alt v-for="(item,key) in example" :key="key"
         @click="big(examplebig,key)" />
       </div>
     </div>
     <div class="imgs">
       <h4>配套({{matching.length}})</h4>
       <div class="imgs-con">
-        <img :src="item.small" alt v-for="(item,key) in matching" :key="key" @click="big(matchingbig,key)" />
+        <img v-lazy="item.small" alt v-for="(item,key) in matching" :key="key" @click="big(matchingbig,key)" />
       </div>
     </div>
     <div class="imgs">
       <h4>交通图({{traffic.length}})</h4>
       <div class="imgs-con">
-        <img :src="item.small" alt v-for="(item,key) in traffic" :key="key" @click="big(trafficbig,key)" />
+        <img v-lazy="item.small" alt v-for="(item,key) in traffic" :key="key" @click="big(trafficbig,key)" />
       </div>
     </div>
     <div class="hu">
       <h4>户型图({{departments.length}})</h4>
       <div class="imgs-con">
         <div class="img" v-for="(item,key) in departments" :key="key">
-          <img :src="item.small" alt @click="big(departmentsbig,key)" />
+          <img v-lazy="item.small" alt @click="big(departmentsbig,key)" />
         </div>
       </div>
     </div>
     <foot :tel="tel" @fot="chang($event)"></foot>
-    <van-popup v-model="show" position="right" :style="{ height: '100%',width:'61%' }">
-      <list :num="4"></list>
+    <van-popup v-model="show" position="right" :style="{ height: '100%',width:'61%' }" duration="0.2">
+      <list :num="3"></list>
     </van-popup>
     <van-popup v-model="tan" :style="{background:'rgba(0,0,0,0)'}" @click-overlay="typebtn = 0">
       <popup :typenum="typenum" :id="id" :name="name" @close="cli($event)" :typebtn="typebtn"></popup>
@@ -86,7 +86,8 @@ export default {
       matching: [],
       matchingbig: [],
       departments: [],
-      departmentsbig: []
+      departmentsbig: [],
+      proname:''
     };
   },
   methods: {
@@ -144,6 +145,7 @@ export default {
     }
   },
   created() {
+    this.proname = sessionStorage.getItem('buildname') ? sessionStorage.getItem('buildname') : '易得房'
     this.start();
   },
 };

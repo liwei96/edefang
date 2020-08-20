@@ -1,12 +1,12 @@
 <template>
-  <div class="Hudeal" v-cloak>
+  <div class="Hudeal" v-cloak v-wechat-title="proname">
     <header>
       <img src="../assets/leftgo.png" alt class="back" @click="back" />
       <img src="../assets/logo.png" alt class="logo" />
       <img src="../assets/list.png" alt class="list" @click="show=true" />
     </header>
     <div class="topimg">
-      <img :src="now.img" alt />
+      <img v-lazy="now.img" alt />
     </div>
     <div class="hu-con">
       <h3>
@@ -50,7 +50,7 @@
     </div>
     <div class="line"></div>
     <div class="peo">
-      <img class="peoimg" :src="staff.head_img" alt />
+      <img class="peoimg" v-lazy="staff.head_img" alt />
       <div class="peo-msg">
         <h6>
           {{staff.name}}
@@ -61,20 +61,22 @@
           <span>{{staff.ServeNum}}</span>人
         </p>
       </div>
-      <img src="../assets/msg.png" alt class="zixun" />
-      <img src="../assets/tel.png" alt class="tel" />
+      <img src="../assets/msg.png" alt class="zixun" @click="gotalk" />
+      <a :href="'tel:'+tel">
+        <img src="../assets/tel.png" alt class="tel" />
+      </a>
     </div>
     <div class="analyze">
       <h4>户型分析</h4>
       <p>{{now.analysis}}</p>
       <!-- <p>2.有两个卫生间，可供三口之家同时洗漱。</p> -->
-      <button>咨询详细户型分析</button>
+      <button @click="showbox(59,'咨询详细户型')">咨询详细户型分析</button>
     </div>
     <div class="line"></div>
     <div class="hus">
       <h4>本楼盘其它户型</h4>
       <div class="hus-con" v-for="(item,key) in other" :key="key">
-        <img :src="item.img" alt />
+        <img v-lazy="item.img" alt />
         <div class="con-right">
           <h5>
             {{item.title}}
@@ -90,17 +92,11 @@
       </div>
     </div>
     <foot :tel="tel" @fot="chang($event)"></foot>
-    <van-popup v-model="show" position="right" :style="{ height: '100%',width:'61%' }" >
-      <list :num="1"></list>
+    <van-popup v-model="show" position="right" :style="{ height: '100%',width:'61%' }" duration="0.2">
+      <list :num="0"></list>
     </van-popup>
     <van-popup v-model="tan" :style="{background:'rgba(0,0,0,0)'}" @click-overlay="typebtn = 0">
-      <popup
-        :typenum="typenum"
-        :id="id"
-        :name="name"
-        @close="cli($event)"
-        :typebtn="typebtn"
-      ></popup>
+      <popup :typenum="typenum" :id="id" :name="name" @close="cli($event)" :typebtn="typebtn"></popup>
     </van-popup>
   </div>
 </template>
@@ -127,6 +123,7 @@ export default {
       now: {},
       other: [],
       staff: {},
+      proname: "",
     };
   },
   methods: {
@@ -134,7 +131,7 @@ export default {
       this.typenum = data.position;
       this.name = data.name;
       this.tan = true;
-      this.typebtn = 1
+      this.typebtn = 1;
     },
     cli(e) {
       this.tan = e;
@@ -147,7 +144,7 @@ export default {
       let id = this.$route.params.id;
       let hid = this.$route.params.hid;
       this.id = Number(id);
-      let token = this.$cookies.get('token');
+      let token = this.$cookies.get("token");
       gethus({ id: id, token: token }).then((res) => {
         console.log(res);
         for (let key in res.data.departments) {
@@ -160,7 +157,6 @@ export default {
           1
         );
         this.other = res.data.departments;
-        console.log(res.data.departments);
         this.tel = res.data.common.phone;
         this.staff = res.data.common.staffs[0];
       });
@@ -172,17 +168,30 @@ export default {
       this.typenum = id;
       this.name = name;
       this.tan = true;
-      this.typebtn = 1
+      this.typebtn = 1;
+    },
+    gotalk() {
+      let url = window.location.href;
+      let newurl = url.split("?")[0];
+      let id = this.$route.params.id;
+      let name = sessionStorage.getItem("buildname");
+      newurl += `?proid=${id}&name=${name}`;
+      newurl = encodeURIComponent(newurl);
+      window.location.href =
+        "http://www.jy1980.com:9191/hangzhou/talk?reconnect=" + newurl;
     },
   },
   created() {
+    this.proname = sessionStorage.getItem("buildname")
+      ? sessionStorage.getItem("buildname")
+      : "易得房";
     this.start();
   },
 };
 </script>
 <style lang="less" scoped>
-[v-cloak]{
-  display: none!important;
+[v-cloak] {
+  display: none !important;
 }
 header {
   height: 2.5rem;

@@ -1,5 +1,5 @@
 <template>
-  <div class="about">
+  <div class="about" v-wechat-title="proname">
     <header>
       <img class="logo" src="../assets/logo.png" alt />
       <span>联系我们</span>
@@ -34,8 +34,8 @@
         <button @click="put">提交</button>
       </div>
     </div>
-    <van-popup v-model="show" position="right" :style="{ height: '100%',width:'61%' }">
-      <list :num="5"></list>
+    <van-popup v-model="show" position="right" :style="{ height: '100%',width:'61%' }" duration="0.2">
+      <list :num="4"></list>
     </van-popup>
   </div>
 </template>
@@ -53,6 +53,7 @@ export default {
       isover: true,
       con: "",
       baoming: "",
+      proname:''
     };
   },
   components: {
@@ -60,7 +61,6 @@ export default {
   },
   methods: {
     mmap() {
-      this.over = false;
       let that = this;
       let baidu = this.baidu;
       let img = require("../assets/mappro.png");
@@ -110,6 +110,7 @@ export default {
       let token = this.$cookies.get('token');
       aboutus({ id: id, token: token }).then((res) => {
         this.baidu = [res.data.data.longitude, res.data.data.latitude];
+        this.mmap()
         this.introduces = res.data.introduces;
         this.tel = res.data.common.phone;
       });
@@ -139,7 +140,8 @@ export default {
       }
       putmsg({
         tel: phone,
-        page: 7,
+        page: 9,
+        ip:ip,
         project: id,
         remark: con,
         source: "线上推广3",
@@ -153,6 +155,7 @@ export default {
     },
   },
   mounted() {
+    this.proname = sessionStorage.getItem('buildname') ? sessionStorage.getItem('buildname') : '易得房'
     this.start();
     // this.mmap();
   },

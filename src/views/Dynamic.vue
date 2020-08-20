@@ -1,5 +1,5 @@
 <template>
-  <div class="app">
+  <div class="app" v-wechat-title="proname">
     <header>
       <img class="logo" src="../assets/logo.png" alt />
       <span>楼盘动态</span>
@@ -9,7 +9,7 @@
       <div class="box1" v-for="(item,key) in list" :key="key">
         <div class="quan1"></div>
         <div class="time">{{item.time}}</div>
-        <h5>最新房源动态</h5>
+        <h5>{{item.title}}</h5>
         <p>
           <em>
             {{item.introduce.substr(0,60)}}
@@ -22,8 +22,8 @@
     </div>
 
     <foot :tel="tel" @fot="chang($event)"></foot>
-    <van-popup v-model="show" position="right" :style="{ height: '100%',width:'61%' }">
-      <list :num="3"></list>
+    <van-popup v-model="show" position="right" :style="{ height: '100%',width:'61%' }" duration="0.2">
+      <list :num="2"></list>
     </van-popup>
     <van-popup v-model="tan" :style="{background:'rgba(0,0,0,0)'}" @click-overlay="typebtn =0">
       <popup
@@ -31,7 +31,6 @@
         :id="id"
         :name="name"
         @close="cli($event)"
-        @click.native="setnew"
         :typebtn="typebtn"
       ></popup>
     </van-popup>
@@ -61,6 +60,7 @@ export default {
       num: -1,
       page: 2,
       isover: true,
+      proname:''
     };
   },
   methods: {
@@ -112,8 +112,12 @@ export default {
       now.style.display = "none";
       now.previousElementSibling.style.display = "none";
     },
+    cli(e) {
+      this.tan = e;
+    },
   },
   created() {
+    this.proname = sessionStorage.getItem('buildname') ? sessionStorage.getItem('buildname') : '易得房'
     this.start();
     window.addEventListener("scroll", this.scroll);
   },

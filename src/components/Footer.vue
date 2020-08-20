@@ -1,11 +1,11 @@
 <template>
   <div class="nav">
-    <div class="nav-peo">
+    <div class="nav-peo" @click="gotalk">
       <img src="../assets/jiapeo.png" alt />
       <span v-if="btn"></span>
       <p>咨询</p>
     </div>
-    <div class="nav-msg" @click="gotalk">
+    <div class="nav-msg" >
       <h5>咨询师</h5>
       <p>在线分析</p>
     </div>

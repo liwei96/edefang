@@ -1,9 +1,9 @@
 <template>
   <div id="Comments">
     <header>
-      <img src="../assets/leftgo.png" alt class="back" @click="back"/>
+      <img src="../assets/leftgo.png" alt class="back" @click="back" />
       更多点评
-      <img src="../assets/list.png" alt class="list" @click="show=true"/>
+      <img src="../assets/list.png" alt class="list" @click="show=true" />
     </header>
     <div class="comment">
       <div class="con" v-for="(item,key) in list" :key="key">
@@ -17,22 +17,24 @@
             <i @click="del(item.id)" v-if="item.mine == 1">删除</i>
             <span>
               <img
-                :src="item.my_like == 0 ? before : after"
+                v-lazy="item.my_like == 0 ? before : after"
                 @click="agrees(item.my_like,item.id,key)"
               />
               {{item.like_num}}
             </span>
           </p>
-          <div class="two" v-if="item.children.length" v-for="(val,k) in item.children" :key="k">
-            <p class="two-con">
-              <span>{{val.moblie}}:</span>
-              {{val.content}}
-            </p>
-            <p class="twotime">
-              {{val.time.substr(0,10)}} &nbsp;
-              <span @click="del(val.id)">删除</span>
-            </p>
-          </div>
+          <template v-for="(val,k) in item.children">
+            <div class="two" v-if="item.children.length" :key="k">
+              <p class="two-con">
+                <span>{{val.mobile}}:</span>
+                {{val.content}}
+              </p>
+              <p class="twotime">
+                {{val.time.substr(0,10)}} &nbsp;
+                <span @click="del(val.id)">删除</span>
+              </p>
+            </div>
+          </template>
         </div>
       </div>
     </div>
@@ -47,8 +49,8 @@
         :typebtn="typebtn"
       ></popup>
     </van-popup>
-    <van-popup v-model="show" position="right" :style="{ height: '100%',width:'61%' }">
-      <list :num="1"></list>
+    <van-popup v-model="show" position="right" :style="{ height: '100%',width:'61%' }" duration="0.2">
+      <list :num="0"></list>
     </van-popup>
   </div>
 </template>
@@ -61,7 +63,7 @@ export default {
   components: {
     foot: footer,
     popup,
-    List
+    List,
   },
   data() {
     return {
@@ -74,15 +76,16 @@ export default {
       list: [],
       before: require("../assets/noclick.png"),
       after: require("../assets/clicked.png"),
-      show:false,
-      isover:true
+      show: false,
+      isover: true,
     };
   },
   methods: {
     start() {
       let id = this.$route.params.id;
       this.id = Number(id);
-      getcomments({ id: id, page: 1, limit: 10 }).then((res) => {
+      let token = this.$cookies.get('token')
+      getcomments({ id: id, page: 1, limit: 10,token:token }).then((res) => {
         console.log(res);
         this.tel = res.data.common.phone;
         this.list = res.data.data;
@@ -94,43 +97,44 @@ export default {
       this.tan = true;
     },
     agrees(type, id, key) {
-      let token = this.$cookies.get('token')
+      let token = this.$cookies.get("token");
       if (token) {
         if (this.isover) {
           this.isover = false;
-          agcomment({ token: token, id: id }).then(
-            (res) => {
-              this.isover = true;
-              this.list[key].like_num = res.data.like_num;
-            }
-          );
+          agcomment({ token: token, id: id }).then((res) => {
+            this.isover = true;
+            this.list[key].like_num = res.data.like_num;
+          });
         }
       } else {
         sessionStorage.setItem("back", this.$route.path);
-        this.$router.push("/login/"+this.$route.params.id);
+        this.$router.push("/login/" + this.$route.params.id);
       }
     },
     gocomment(id) {
-      sessionStorage.setItem("pid", id);
       let l = this.$route.params.id;
-      this.$router.push("/comment/" + l);
-    },
-    del(id) {
-      let token = this.$cookies.get('token')
-      if (token) {
-        delcomment({ token: token, id: id }).then(
-          (res) => {
-            this.$router.go(0);
-          }
-        );
+      if (this.$cookies.get("token")) {
+        sessionStorage.setItem("pid", id);
+        this.$router.push("/discuss/" + l);
       } else {
-        sessionStorage.setItem("back", this.$route.path);
-        this.$router.push("/login/"+this.$route.params.id);
+        this.$router.push("/login/" + l);
       }
     },
-    back(){
-      this.$router.go(-1)
-    }
+    del(id) {
+      let token = this.$cookies.get("token");
+      if (token) {
+        delcomment({ token: token, id: id }).then((res) => {
+          this.$router.go(0);
+        });
+      } else {
+        sessionStorage.setItem("back", this.$route.path);
+        this.$router.push("/login/" + this.$route.params.id);
+      }
+    },
+    back() {
+      let id = this.$route.params.id;
+      this.$router.push("/index/" + id);
+    },
   },
   mounted() {
     this.start();

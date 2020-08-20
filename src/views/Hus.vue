@@ -1,5 +1,5 @@
 <template>
-  <div id="Hus">
+  <div id="Hus" v-wechat-title="proname">
     <header>
       <img src="../assets/leftgo.png" alt class="back" @click="back" />
       <img src="../assets/logo.png" alt class="logo" />
@@ -8,7 +8,7 @@
     <div class="hus">
       <div class="hus-con" v-for="(item,key) in departments" :key="key">
         <router-link :to="'/hudeal/'+id+'/'+item.id">
-        <img :src="item.img" alt />
+        <img v-lazy="item.img" alt />
         <div class="con-right">
           <h5>
             {{item.title}}
@@ -24,40 +24,71 @@
         </router-link>
       </div>
     </div>
-    <van-popup v-model="show" position="right" :style="{ height: '100%',width:'61%' }">
-      <list :num="1"></list>
+    <foot :tel="tel" @fot="chang($event)"></foot>
+    <van-popup v-model="show" position="right" :style="{ height: '100%',width:'61%' }" duration="0.2">
+      <list :num="0"></list>
+    </van-popup>
+    <van-popup v-model="tan" :style="{background:'rgba(0,0,0,0)'}" @click-overlay="typebtn = 0">
+      <popup
+        :typenum="typenum"
+        :id="id"
+        :name="name"
+        @close="cli($event)"
+        :typebtn="typebtn"
+      ></popup>
     </van-popup>
   </div>
 </template>
 <script>
 import { gethus } from "../api/api";
 import list from "../components/List";
+import foot from "../components/Footer";
+import popup from "../components/Popup";
 export default {
   data() {
     return {
       departments: [],
       show: false,
-      id:''
+      id:'',
+      tel:'',
+      name: "",
+      typebtn: 1,
+      typenum: 0,
+      tan: false,
+      proname:''
     };
   },
   components: {
     list,
+    popup,
+    foot
   },
   methods: {
+    chang(data) {
+      this.typenum = data.position;
+      this.name = data.name;
+      this.tan = true;
+      this.typebtn = 1
+    },
     start() {
       let id = this.$route.params.id;
-      this.id=id
+      this.id=Number(id)
       let token = this.$cookies.get('token');
       gethus({ id: id, token: token }).then((res) => {
         console.log(res);
         this.departments = res.data.departments;
+        this.tel = res.data.common.phone
       });
     },
     back(){
       this.$router.go(-1)
-    }
+    },
+    cli(e) {
+      this.tan = e;
+    },
   },
   created() {
+    this.proname = sessionStorage.getItem('buildname') ? sessionStorage.getItem('buildname') : '易得房'
     this.start();
   },
 };

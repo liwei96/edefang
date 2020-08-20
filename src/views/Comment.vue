@@ -1,13 +1,13 @@
 <template>
   <div id="Comment">
     <header>
-      <img src="../assets/leftgo.png" alt class="back" />
+      <img src="../assets/leftgo.png" alt class="back" @click="back"/>
       我要点评
       <img src="../assets/list.png" alt class="list" @click="show = true"/>
     </header>
     <div class="con">
-      <h6>是否考虑购买该楼盘？</h6>
-      <p class="type">
+      <h6 v-if="pid == 0">是否考虑购买该楼盘？</h6>
+      <p class="type"  v-if="pid == 0">
         必填
         <span
           :class="btnnum == key ? 'active':''"
@@ -16,7 +16,7 @@
           @click="btnnum = key"
         >{{item}}</span>
       </p>
-      <div class="rate">
+      <div class="rate"  v-if="pid == 0">
         <span class="ratemsg">
           综合评分
           <i>{{value}}.0</i>分
@@ -27,8 +27,8 @@
       <textarea placeholder="输入您精彩评论" v-model="con"></textarea>
       <button @click="put">发表</button>
     </div>
-    <van-popup v-model="show" position="right" :style="{ height: '100%',width:'61%' }">
-      <list :num="1"></list>
+    <van-popup v-model="show" position="right" :style="{ height: '100%',width:'61%' }" duration="0.2">
+      <list :num="0"></list>
     </van-popup>
   </div>
 </template>
@@ -43,7 +43,8 @@ export default {
       btnnum: 0,
       con: "",
       show:false,
-      tishi:'一般'
+      tishi:'一般',
+      pid:0
     };
   },
   components:{
@@ -68,8 +69,12 @@ export default {
         comment({token:token,'bid':id,content:con,consider_buy:connum,score:star,pid:pid}).then((res) => {
           console.log(res);
           if(res.data.code == 200) {
-              sessionStorage.removeItem('pid')
-              this.$router.push('/index/'+id)
+              if(sessionStorage.getItem('pid')){
+                sessionStorage.removeItem('pid')
+                this.$router.push('/discusss/'+id)
+              }else{
+                this.$router.push('/index/'+id)
+              }
           }
         });
       } else {
@@ -78,6 +83,15 @@ export default {
         this.$router.push("/login/"+id);
       }
     },
+    back(){
+      this.$router.go(-1)
+    }
+  },
+  mounted(){
+    if(sessionStorage.getItem('pid')){
+      this.pid =  sessionStorage.getItem('pid')
+    }
+    
   },
   watch:{
     value(val){
@@ -93,6 +107,9 @@ export default {
         this.tishi = '非常好'
       }
     }
+  },
+  beforeDestroy(){
+    sessionStorage.removeItem('pid')
   }
 };
 </script>

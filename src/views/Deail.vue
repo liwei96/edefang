@@ -200,6 +200,7 @@ export default {
     },
     go(){
         this.$router.push('/hus/'+this.id)
+        
     }
   },
   created(){

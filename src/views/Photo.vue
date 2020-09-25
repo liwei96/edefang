@@ -131,7 +131,6 @@ export default {
       this.typebtn = 1;
     },
     big(arr, k) {
-      
       ImagePreview({
         images: arr,
         startPosition: k,

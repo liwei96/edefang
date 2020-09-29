@@ -104,7 +104,7 @@ export default {
           var interval = setInterval(fn, 1000);
           $("#ytel").html(tel);
         } else {
-          this.$toast.fail(res.data.message);
+          this.$toast.fail(res.data.message || res.data.msg);
         }
       });
     },
@@ -137,7 +137,7 @@ export default {
             this.$cookies.set("tel", phone, 21600);
           }
         } else {
-          this.$toast(res.data.message)
+          this.$toast(res.data.message || res.data.msg)
         }
         this.type= false
         this.$emit("close", false);
